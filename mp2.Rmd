@@ -11,8 +11,104 @@ output: html_document
 This project is so interesting and relevant to my life!
 
 ```{r, include=FALSE}
+library(tidyverse)
 load("house_elections.rda")
 load("candidates.rda")
 load("committees.rda")
 load("contributions.rda")
 ```
+
+
+```{r}
+candi<-candidates%>%
+  select(cand_id,cand_name,cand_party_affiliation,cand_state)
+```
+
+
+```{r}
+contri_candi<-contributions%>%
+  select(cmte_id,cand_id,state,transaction_amt)%>%
+  left_join(candi, by="cand_id")
+contri_candi
+```
+
+```{r}
+commi<-committees%>%
+  select(cmte_id,cmte_name,cmte_state,cmte_party_affiliation)
+```
+
+
+```{r}
+table1<-contri_candi%>%
+  left_join(commi,by="cmte_id")%>%
+  rename(contribution_state=state)%>%
+  select(cand_name,cand_party_affiliation,cand_state,cmte_state,transaction_amt,cmte_name,cmte_party_affiliation)
+table1
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+cmteNcandPartySame <- table1%>%
+  filter(cand_party_affiliation==cmte_party_affiliation)%>%
+  select(cand_party_affiliation,cmte_party_affiliation,cand_name)%>%
+  summarise(sum_partyEqual = n())
+cmteNcandPartySame
+```
+```{r}
+cmteNcandStateSame <- table1%>%
+  filter(cand_state==cmte_state)%>%
+  select(cand_state,cmte_state,cand_name)%>%
+  summarise(sum_stateEqual = n())
+cmteNcandStateSame
+```
+
+```{r}
+
+```
+
+
+```{r}
+contributions%>%
+  select(cmte_id,cand_id,state,transaction_amt,entity_type)%>%
+  left_join(candi, by="cand_id")%>%
+  left_join(commi,by="cmte_id")%>%
+  select(cand_name,transaction_amt,entity_type)%>%
+  arrange(desc(transaction_amt))
+```
+
+```{r}
+contributions%>%
+  select(cmte_id,cand_id,state,transaction_amt,entity_type)%>%
+  left_join(candi, by="cand_id")%>%
+  left_join(commi,by="cmte_id")%>%
+  select(cand_name,transaction_amt,entity_type)%>%
+  filter(cand_name%in%("OBAMA, BARACK","ROMNEY, MITT / RYAN, PAUL D."))
+```
+
+```{r}
+equal=function(p1,p2){
+  table1%>%
+  filter(p1==p2)%>%
+  select(p1,p2,cand_name)%>%
+  summarise(sum_partyEqual = n())}
+unequal = function(p1,p2){
+  table1%>%
+  filter(p1!=p2)%>%
+  select(p1,p2,cand_name)%>%
+  summarise(sum_partyEqual = n())
+}
+ratio = function(p1,p2){
+  table1%>%
+  equal(p1,p2)/unequal(p1,p2)}
+
+```
+
+```{r}
+ratio(p1="cand_state",p2="cmte_state")
+```
+
