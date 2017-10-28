@@ -16,6 +16,7 @@ load("house_elections.rda")
 load("candidates.rda")
 load("committees.rda")
 load("contributions.rda")
+library(hydroGOF)
 ```
 
 
@@ -61,7 +62,8 @@ sum
 
 
 ```{r}
-sum%>%left_join(vote, by="cand_name")
+graph_table<-sum%>%left_join(vote, by="cand_name")
+graph_table
 ```
 
 
@@ -84,10 +86,7 @@ compare(name_arg="PIERLUISI, PEDRO R")
 ```
 
 
-```{r}
 
-
-```
 
 
 
