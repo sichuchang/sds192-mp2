@@ -44,7 +44,8 @@ newtable1
 
 ```{r}
 vote<-left_join(house_elections, candidates, by = c("fec_id" = "cand_id"))%>%
-  select(cand_name,general_votes)%>%arrange(desc(general_votes))
+  select(cand_name,general_votes)%>%arrange(desc(general_votes))%>%
+  arrange(desc(general_votes))
 vote
 ```
 
@@ -55,18 +56,40 @@ vote
 ```{r}
 sum<-newtable1%>%
     group_by(cand_name)%>%
-    summarize(sum=sum(transaction_amt))%>%
-  filter(cand_name%in%c("PIERLUISI, PEDRO R","ALOMAR, RAFAEL COX","DELBENE, SUZAN K","PAYNE, DONALD M., JR.","MASSIE, THOMAS H.","BENTIVOLIO, KERRY","FATTAH, CHAKA MR.","MCDERMOTT, JAMES","KOSTER, JOHN","PETERS, GARY"))
+    summarize(sum=sum(transaction_amt))#%>%
+  #filter(cand_name%in%c("PIERLUISI, PEDRO R","ALOMAR, RAFAEL COX","DELBENE, SUZAN K","PAYNE, DONALD M., JR.","MASSIE, THOMAS H.","BENTIVOLIO, KERRY","FATTAH, CHAKA MR.","MCDERMOTT, JAMES","KOSTER, JOHN","PETERS, GARY"))
 sum
 ```
 
 
 ```{r}
-graph_table<-sum%>%left_join(vote, by="cand_name")
+graph_table<-sum%>%full_join(vote, by="cand_name")%>%
+  filter(!is.na(general_votes),!general_votes==0)%>%
+  head(779)
 graph_table
 ```
 
+```{r}
+ggplot(graph_table,aes(x=sum,y=general_votes))+geom_point()+geom_smooth()
+```
 
+
+```{r}
+newGraph_table = graph_table%>%
+  filter(general_votes<750000)%>%
+  ggplot(aes(x = sum, y =general_votes))+
+  geom_point()+geom_smooth()
+                                                              
+newGraph_table  
+```
+
+
+
+
+```{r}
+graph_table%>%
+ filter(general_votes>750000)
+```
 
 
 
