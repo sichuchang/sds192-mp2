@@ -65,6 +65,10 @@ sum%>%left_join(vote, by="cand_name")
 ```
 
 
+
+
+
+
 ```{r}
 compare<-function(name_arg){
   newtable1 %>%
